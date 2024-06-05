@@ -1,7 +1,7 @@
 #ifndef _CALCULATOR_HPP_
 #define _CALCULATOR_HPP_
 
-#include "ActiveObject.hpp"
+#include "activeobject.hpp"
 
 #include <string>
 #include <future>

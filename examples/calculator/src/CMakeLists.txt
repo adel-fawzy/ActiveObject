@@ -4,7 +4,7 @@ project(Calculator LANGUAGES CXX)
 
 find_package(Threads)                                                                                                                                                                      
 
-add_executable(${PROJECT_NAME} main.cpp Calculator.cpp)
+add_executable(${PROJECT_NAME} main.cpp calculator.cpp)
 
 target_link_libraries(${PROJECT_NAME}  ${CMAKE_THREAD_LIBS_INIT})
 
