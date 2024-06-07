@@ -104,9 +104,8 @@ public:
 
 	virtual ~ActiveObject()
 	{
-		addEvent<bool>([this]() -> bool {
+		addEvent([this]{
 			_stop.store(true);
-			return _stop.load();
 		});
 		_thread.join();
 	}
@@ -129,29 +128,11 @@ public:
 protected:
 
         /*
-	 * DESCRIPTION: Adds an event to the event loop and then waits for that particular event to be handled and then return its response. Note
-         * that this function is a blocking function.
-	 */
-	template<typename T>
-	T addEvent(std::function<T()> eventHandler)
-	{
-		std::promise<T> promise;
-		std::future<T> future_response = promise.get_future();
-		_queue.pushEvent([&promise, &eventHandler](){
-			promise.set_value(eventHandler());
-		});
-		return future_response.get();
-	}
-
-        /*
 	 * DESCRIPTION: Adds an event to the event loop.
 	 */
-	template<typename T>
-	void addEvent(std::function<T()> eventHandler, std::function<void(T)> callback)
+	void addEvent(std::function<void()> eventHandler)
 	{
-		_queue.pushEvent([=](){
-			callback(eventHandler());
-		});
+		_queue.pushEvent(eventHandler);
 	}
 
 	/********************************************************************************************************************************************

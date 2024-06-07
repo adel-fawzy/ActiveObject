@@ -89,12 +89,12 @@ public:
 private:
 
 	/*
-	 * DESCRIPTION: Returns the type of the calculator synchronously.
-	 */
+ 	* DESCRIPTION: Returns the type of the calculator synchronously.
+ 	*/
 	std::string _getType();
 
 	/*
-	 * DESCRIPTION: Sets the type of the calculator synchronously.
+ 	* DESCRIPTION: Sets the type of the calculator synchronously.
 	 */
 	bool _setType(std::string type);
 

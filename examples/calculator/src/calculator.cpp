@@ -9,9 +9,10 @@
  */
 void Calculator::setType(std::string type, std::function<void(bool)> callback)
 {
-	ActiveObject::addEvent<bool>([this, type]() -> bool {
-		return _setType(type);
-	}, callback);
+	ActiveObject::addEvent([this, type, callback]{
+		_setType(type);
+		callback(true);
+	});
 }
 
 /*
@@ -19,9 +20,12 @@ void Calculator::setType(std::string type, std::function<void(bool)> callback)
  */
 bool Calculator::setType(std::string type)
 {
-	return ActiveObject::addEvent<bool>([this, type]() -> bool {
-		return _setType(type);
+	std::promise<bool> promise;
+	ActiveObject::addEvent([this, &promise, type]{
+		_setType(type);
+		promise.set_value(true);
 	});
+	return promise.get_future().get();
 }
 
 /*
@@ -29,49 +33,55 @@ bool Calculator::setType(std::string type)
  */
 void Calculator::getType(std::function<void(std::string)> callback)
 {
-	ActiveObject::addEvent<std::string>([this]() -> std::string {
-		return _getType();
-	}, callback);
+	ActiveObject::addEvent([this, callback]{
+		callback(_getType());
+	});
 }
-	
+
 /*
  * DESCRIPTION: Request to get the calculator type synchronously.
  */
 std::string Calculator::getType()
 {
-	return ActiveObject::addEvent<std::string>([this]() -> std::string {
-		return _getType();
+	std::promise<std::string> promise;
+	ActiveObject::addEvent([this, &promise]{
+		promise.set_value(_getType());
 	});
-}
-	
-/*
- * DESCRIPTION: Request to add two integars asynchronously.
- */
-int Calculator::add(int firstNumber, int secondNumber)
-{
-	return ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _add(firstNumber, secondNumber);
-	});
+	return promise.get_future().get();
 }
 
 /*
  * DESCRIPTION: Request to add two integars synchronously.
  */
+int Calculator::add(int firstNumber, int secondNumber)
+{
+	std::promise<int> promise;
+	ActiveObject::addEvent([this, &promise, &firstNumber, &secondNumber]{
+		promise.set_value(_add(firstNumber, secondNumber));
+	});
+	return promise.get_future().get();
+}
+
+/*
+ * DESCRIPTION: Request to add two integars asynchronously.
+ */
 void Calculator::add(int firstNumber, int secondNumber, std::function<void(int result)> callback)
 {
-	ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _add(firstNumber, secondNumber);
-	}, callback);
+	ActiveObject::addEvent([this, firstNumber, secondNumber, callback]{
+		callback(_add(firstNumber, secondNumber));
+	});
 }
-	
+
 /*
  * DESCRIPTION: Request to subtract the second integar from the first integar synchronously.
  */
 int Calculator::subtract(int firstNumber, int secondNumber)
 {
-	return ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _subtract(firstNumber, secondNumber);
+	std::promise<int> promise;
+	ActiveObject::addEvent([this, &promise, &firstNumber, &secondNumber]{
+		promise.set_value(_subtract(firstNumber, secondNumber));
 	});
+	return promise.get_future().get();
 }
 
 /*
@@ -79,9 +89,9 @@ int Calculator::subtract(int firstNumber, int secondNumber)
  */
 void Calculator::subtract(int firstNumber, int secondNumber, std::function<void(int result)> callback)
 {
-	ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _subtract(firstNumber, secondNumber);
-	}, callback);
+	ActiveObject::addEvent([this, firstNumber, secondNumber, callback]{
+		callback(_subtract(firstNumber, secondNumber));
+	});
 }
 
 /*
@@ -89,9 +99,11 @@ void Calculator::subtract(int firstNumber, int secondNumber, std::function<void(
  */
 int Calculator::multiply(int firstNumber, int secondNumber)
 {
-	return ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _multiply(firstNumber, secondNumber);
+	std::promise<int> promise;
+	ActiveObject::addEvent([this, &promise, &firstNumber, &secondNumber]{
+		promise.set_value(_multiply(firstNumber, secondNumber));
 	});
+	return promise.get_future().get();
 }
 
 /*
@@ -99,9 +111,9 @@ int Calculator::multiply(int firstNumber, int secondNumber)
  */
 void Calculator::multiply(int firstNumber, int secondNumber, std::function<void(int result)> callback)
 {
-	ActiveObject::addEvent<int>([this, firstNumber, secondNumber]() -> int {
-		return _multiply(firstNumber, secondNumber);
-	}, callback);
+	ActiveObject::addEvent([this, firstNumber, secondNumber, callback]{
+		callback(_multiply(firstNumber, secondNumber));
+	});
 }
 
 /********************************************************************************************************************************************
@@ -122,7 +134,7 @@ std::string Calculator::_getType()
 bool Calculator::_setType(std::string type)
 {
 	_type = type;
-	return true;
+   	return true;
 }
 
 /*
